@@ -1,3 +1,4 @@
+import { dedupeKey, seenRecently } from '../src/dedupe.js'
 import { formatEvent } from '../src/format.js'
 import { postToDiscord } from '../src/discord.js'
 import { isValidSignature, secretsFromEnv } from '../src/verify.js'
@@ -32,6 +33,9 @@ export async function POST(request: Request): Promise<Response> {
   } catch {
     return Response.json({ error: 'Body is not JSON' }, { status: 400 })
   }
+
+  const key = dedupeKey(body)
+  if (key && seenRecently(key)) return Response.json({ ok: true, duplicate: true })
 
   const result = await postToDiscord(discordUrl, formatEvent(body))
   if (result.ok) return Response.json({ ok: true })

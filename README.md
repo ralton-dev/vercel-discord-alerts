@@ -73,6 +73,11 @@ public deployment of this code cannot be used to spam a channel.
   retries the delivery with backoff for up to 24 hours.
 - If Discord refuses the message (other 4xx) the relay logs it and answers
   200, because retrying the same message cannot succeed.
+- Vercel sometimes sends the same deployment event twice, as two events with
+  different ids a second apart. A repeat of the same event type for the same
+  deployment within 10 minutes is dropped (answered 200 with
+  `duplicate: true`). The memory is per warm function instance, so a pair
+  that lands on two instances still posts twice; that is rare.
 
 ## Develop
 

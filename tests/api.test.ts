@@ -1,6 +1,7 @@
 import { createHmac } from 'node:crypto'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { GET, POST } from '../api/vercel.js'
+import { resetSeen } from '../src/dedupe.js'
 
 const DISCORD = 'https://discord.example/api/webhooks/1/token'
 const body = JSON.stringify({ type: 'deployment.error', payload: { name: 'site', target: 'production' } })
@@ -27,7 +28,10 @@ describe('GET /api/vercel', () => {
 })
 
 describe('POST /api/vercel', () => {
-  afterEach(() => vi.restoreAllMocks())
+  afterEach(() => {
+    vi.restoreAllMocks()
+    resetSeen()
+  })
 
   it('refuses to run until the secrets and the Discord URL are configured', async () => {
     vi.stubEnv('VERCEL_WEBHOOK_SECRETS', '')
@@ -63,6 +67,26 @@ describe('POST /api/vercel', () => {
     const sent = JSON.parse(String(init.body)) as { username: string; embeds: { title: string }[] }
     expect(sent.username).toBe('Vercel')
     expect(sent.embeds[0]?.title).toBe('Deployment failed · site')
+  })
+
+  it('posts a deployment event once when Vercel delivers it twice under different event ids', async () => {
+    vi.stubEnv('VERCEL_WEBHOOK_SECRETS', 's')
+    vi.stubEnv('DISCORD_WEBHOOK_URL', DISCORD)
+    const fetchMock = discordAnswering(204)
+    const first = JSON.stringify({
+      id: 'evt_1',
+      type: 'deployment.canceled',
+      payload: { name: 'site', deployment: { id: 'dpl_1' } },
+    })
+    const second = JSON.stringify({
+      id: 'evt_2',
+      type: 'deployment.canceled',
+      payload: { name: 'site', deployment: { id: 'dpl_1' } },
+    })
+    expect((await POST(post(first, sign('s', first)))).status).toBe(200)
+    const dup = await POST(post(second, sign('s', second)))
+    expect(await dup.json()).toEqual({ ok: true, duplicate: true })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
   it('asks Vercel to retry when Discord is down, but not when Discord refused the message', async () => {
