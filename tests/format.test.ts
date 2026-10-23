@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { AMBER, formatEvent, GREEN, GREY, RED } from '../src/format'
+import { AMBER, formatEvent, GREEN, GREY, RED } from '../src/format.js'
 
 const deploymentError = {
   id: 'evt_123',

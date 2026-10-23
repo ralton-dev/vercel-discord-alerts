@@ -1,6 +1,6 @@
 import { createHmac } from 'node:crypto'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { GET, POST } from '../api/vercel'
+import { GET, POST } from '../api/vercel.js'
 
 const DISCORD = 'https://discord.example/api/webhooks/1/token'
 const body = JSON.stringify({ type: 'deployment.error', payload: { name: 'site', target: 'production' } })

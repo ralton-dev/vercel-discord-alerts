@@ -1,6 +1,6 @@
-import { formatEvent } from '../src/format'
-import { postToDiscord } from '../src/discord'
-import { isValidSignature, secretsFromEnv } from '../src/verify'
+import { formatEvent } from '../src/format.js'
+import { postToDiscord } from '../src/discord.js'
+import { isValidSignature, secretsFromEnv } from '../src/verify.js'
 
 export const config = { maxDuration: 10 }
 

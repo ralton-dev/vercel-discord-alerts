@@ -1,4 +1,4 @@
-import type { DiscordMessage } from './format'
+import type { DiscordMessage } from './format.js'
 
 export type DiscordResult =
   { ok: true; status: number } | { ok: false; status: number; detail: string; retryable: boolean }

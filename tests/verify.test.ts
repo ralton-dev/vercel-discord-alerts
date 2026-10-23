@@ -1,6 +1,6 @@
 import { createHmac } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
-import { isValidSignature, secretsFromEnv } from '../src/verify'
+import { isValidSignature, secretsFromEnv } from '../src/verify.js'
 
 const body = '{"type":"deployment.error"}'
 const sign = (secret: string) => createHmac('sha1', secret).update(body).digest('hex')
