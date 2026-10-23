@@ -18,6 +18,8 @@ three small modules under `src/`.
 | `deployment.succeeded`, `deployment.promoted`, `deployment.ready` | green, same details                                     |
 | Spend Management (`thresholdPercent` payload)                     | amber at 75%, red at 100%, with budget and spend        |
 | `alerts.triggered`                                                | red, with the alert's name and payload                  |
+| `firewall.attack` and the firewall anomaly events                 | red, with the project and payload                       |
+| `budget.*`                                                        | amber, with the payload                                 |
 | anything else                                                     | grey, with the event type and a JSON snippet            |
 
 Subscribe the webhook to the events you want; the relay formats whatever

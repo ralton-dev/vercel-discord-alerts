@@ -85,7 +85,11 @@ export function formatEvent(body: unknown): DiscordMessage {
     ? deploymentEmbed(type, payload)
     : type === 'alerts.triggered'
       ? alertEmbed(payload)
-      : genericEmbed(type, payload)
+      : type.startsWith('firewall.')
+        ? firewallEmbed(type, payload)
+        : type.startsWith('budget.')
+          ? budgetEmbed(type, payload)
+          : genericEmbed(type, payload)
   embed.footer = { text: [type, text(b.id)].filter(Boolean).join(' · ') }
   embed.timestamp = timestamp(b.createdAt)
   return { username: USERNAME, embeds: [embed] }
@@ -137,6 +141,22 @@ function deploymentEmbed(type: string, p: Dict): DiscordEmbed {
 function alertEmbed(p: Dict): DiscordEmbed {
   const name = text(p.name) ?? text(dict(p.alert).name) ?? 'Alert triggered'
   return { title: `Alert: ${clip(name, 200)}`, description: snippet(p), color: RED }
+}
+
+const FIREWALL_TITLES: Record<string, string> = {
+  'firewall.attack': 'Firewall: attack detected and mitigated',
+  'firewall.system-rule-anomaly': 'Firewall: system rule anomaly',
+  'firewall.custom-rule-anomaly': 'Firewall: custom rule anomaly',
+}
+
+function firewallEmbed(type: string, p: Dict): DiscordEmbed {
+  const project = text(p.name) ?? text(dict(p.project).name)
+  const title = FIREWALL_TITLES[type] ?? `Firewall: ${type.slice('firewall.'.length)}`
+  return { title: project ? `${title} · ${project}` : title, description: snippet(p), color: RED }
+}
+
+function budgetEmbed(type: string, p: Dict): DiscordEmbed {
+  return { title: `Budget: ${type.slice('budget.'.length)}`, description: snippet(p), color: AMBER }
 }
 
 function genericEmbed(type: string, p: Dict): DiscordEmbed {

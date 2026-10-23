@@ -84,6 +84,15 @@ describe('formatEvent', () => {
     expect(msg.embeds[0]?.color).toBe(RED)
   })
 
+  it('reports firewall events in red with a clear title, and budget events in amber', () => {
+    const attack = formatEvent({ type: 'firewall.attack', payload: { name: 'ralton-dev', projectId: 'prj' } })
+    expect(attack.embeds[0]?.title).toBe('Firewall: attack detected and mitigated · ralton-dev')
+    expect(attack.embeds[0]?.color).toBe(RED)
+    const budget = formatEvent({ type: 'budget.reached', payload: { budgetAmount: 1 } })
+    expect(budget.embeds[0]?.title).toBe('Budget: reached')
+    expect(budget.embeds[0]?.color).toBe(AMBER)
+  })
+
   it('never throws on bodies that are not objects', () => {
     expect(formatEvent(null).embeds[0]?.title).toBe('Unrecognised webhook')
     expect(formatEvent('text').embeds[0]?.title).toBe('Unrecognised webhook')
