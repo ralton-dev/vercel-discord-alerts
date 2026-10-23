@@ -40,17 +40,20 @@ arrives and never drops an unknown type.
    Deploy once so the function picks them up. `GET /api/vercel` answers
    `{"ok":true}` when the deployment is live (it does not check the variables).
 
-4. Create the Vercel webhooks that point at it. Team webhooks, from the CLI:
+4. Create the team webhook that points at it. The secret is returned only
+   when the webhook is created, and `vercel webhooks create` does not print
+   it, so use the REST API through the CLI (or the dashboard, Team settings
+   → Webhooks, which shows the secret once):
 
    ```sh
-   vercel webhooks create https://<your-deployment>/api/vercel \
-     --event deployment.error --event deployment.canceled --event alerts.triggered
+   printf '%s' '{"url":"https://<your-deployment>/api/vercel","events":["deployment.error","deployment.canceled","deployment.rollback","alerts.triggered","firewall.attack"]}' \
+     | vercel api /v1/webhooks -X POST --input -
    ```
 
-   The command prints the webhook's secret once. Add it to
-   `VERCEL_WEBHOOK_SECRETS` and redeploy. The dashboard route is Team
-   settings → Webhooks, where the "Attack Detected" firewall event can also be
-   ticked.
+   The response includes `secret`. Add it to `VERCEL_WEBHOOK_SECRETS` and
+   redeploy. Those five event names are the ones the API accepted for an
+   account webhook on 2026-10-23; the longer list in the API reference
+   includes names the server rejects with "invalid webhook event names".
 
 5. Spend Management (Team settings → Billing → Spend Management): enter the
    same URL as the webhook. It has its own secret, shown when saved; append it
