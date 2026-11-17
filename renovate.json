@@ -1,21 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "github>ralton-dev/.github"
-  ],
+  "extends": ["github>ralton-dev/.github"],
   "dependencyDashboardTitle": "Renovate Dashboard — vercel-discord-alerts",
   "packageRules": [
     {
       "description": "Group related Vitest minor/patch releases together.",
-      "matchPackageNames": [
-        "vitest",
-        "@vitest/**"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "digest"
-      ],
+      "matchPackageNames": ["vitest", "@vitest/**"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
       "groupName": "Vitest"
     }
   ]
