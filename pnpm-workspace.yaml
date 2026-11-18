@@ -1,2 +1,10 @@
 allowBuilds:
   esbuild: true
+
+# GHSA-fc5q-39xc-vjpf (picomatch ReDoS, high) covers every picomatch release (<= 4.0.7) and
+# has no fixed version (advisory widened 2026-11-17). picomatch is reached only through
+# dev tooling (vitest; typescript-eslint > tinyglobby) matching the repo's own globs, and
+# `pnpm audit --prod` is clean. Remove this once a fixed picomatch is released.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-fc5q-39xc-vjpf
